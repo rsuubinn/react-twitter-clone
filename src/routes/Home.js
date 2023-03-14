@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { dbService } from "../firebase";
 
-const Home = () => {
+const Home = ({ userObj }) => {
   const [tweet, setTweet] = useState("");
   const [tweets, setTweets] = useState([]);
   const onChange = (event) => {
@@ -10,24 +10,21 @@ const Home = () => {
   const onSubmit = async (event) => {
     event.preventDefault();
     await dbService.collection("tweets").add({
-      tweet,
+      text: tweet,
       createdAt: Date.now(),
+      creatorId: userObj.uid,
     });
     setTweet("");
   };
 
-  const getTweets = async () => {
-    const dbTweets = await dbService.collection("tweets").get();
-    dbTweets.forEach((document) => {
-      const newTweet = {
-        ...document.data(),
-        id: document.id,
-      };
-      setTweets((prev) => [newTweet, ...prev]);
-    });
-  };
   useEffect(() => {
-    getTweets();
+    dbService.collection("tweets").onSnapshot((snapshot) => {
+      const tweetArray = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setTweets(tweetArray);
+    });
   }, []);
   return (
     <div>
@@ -42,7 +39,7 @@ const Home = () => {
       </form>
       <div>
         {tweets.map((tweet) => (
-          <h4 key={tweet.id}>{tweet.tweet}</h4>
+          <h4 key={tweet.id}>{tweet.text}</h4>
         ))}
       </div>
     </div>
