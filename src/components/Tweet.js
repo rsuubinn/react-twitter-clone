@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { dbService } from "../firebase";
+import { dbService, storageService } from "../firebase";
 
 const Tweet = ({ tweet, isOwner }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -8,6 +8,7 @@ const Tweet = ({ tweet, isOwner }) => {
     const ok = window.confirm("트윗을 삭제하시겠습니까?");
     if (ok) {
       await dbService.doc(`tweets/${tweet.id}`).delete();
+      await storageService.refFromURL(tweet.attachmentUrl).delete();
     }
   };
   const toggleIsEditing = () => setIsEditing((prev) => !prev);
