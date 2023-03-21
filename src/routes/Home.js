@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Tweet from "../components/Tweet";
 import { dbService, storageService } from "../firebase";
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4 } from "uuid"; // 랜덤값
 
 const Home = ({ userObj }) => {
   const [tweet, setTweet] = useState("");
@@ -12,15 +12,23 @@ const Home = ({ userObj }) => {
   };
   const onSubmit = async (event) => {
     event.preventDefault();
-    const fileRef = storageService.ref().child(`${userObj.uid}/${uuidv4()}`);
-    const response = await fileRef.putString(attachment, "data_url");
-    console.log(response);
-    // await dbService.collection("tweets").add({
-    //   text: tweet,
-    //   createdAt: Date.now(),
-    //   creatorId: userObj.uid,
-    // });
-    // setTweet("");
+    let attachmentUrl = "";
+    if (attachment !== "") {
+      const attachmentRef = storageService
+        .ref()
+        .child(`${userObj.uid}/${uuidv4()}`);
+      const response = await attachmentRef.putString(attachment, "data_url");
+      attachmentUrl = await response.ref.getDownloadURL();
+    }
+    const tweetObj = {
+      text: tweet,
+      createdAt: Date.now(),
+      creatorId: userObj.uid,
+      attachmentUrl,
+    };
+    await dbService.collection("tweets").add(tweetObj);
+    setTweet("");
+    setAttachment(null);
   };
 
   const onFileChange = (event) => {

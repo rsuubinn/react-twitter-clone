@@ -35,6 +35,9 @@ const Tweet = ({ tweet, isOwner }) => {
       ) : (
         <>
           <h4>{tweet.text}</h4>
+          {tweet.attachmentUrl && (
+            <img src={tweet.attachmentUrl} width="100px" height="100px" />
+          )}
           {isOwner && (
             <>
               <button onClick={onDeleteClick}>삭제하기</button>
