@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid"; // 랜덤값
 const Home = ({ userObj }) => {
   const [tweet, setTweet] = useState("");
   const [tweets, setTweets] = useState([]);
-  const [attachment, setAttachment] = useState();
+  const [attachment, setAttachment] = useState("");
   const onChange = (event) => {
     setTweet(event.target.value);
   };
@@ -28,7 +28,7 @@ const Home = ({ userObj }) => {
     };
     await dbService.collection("tweets").add(tweetObj);
     setTweet("");
-    setAttachment(null);
+    setAttachment("");
   };
 
   const onFileChange = (event) => {
